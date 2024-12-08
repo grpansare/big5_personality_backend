@@ -7,13 +7,19 @@ const userSchema = new mongoose.Schema({
       type:String,
       required:true
     },
-    
+    phoneno:Number,
+    age:Number,
+    Designation:{
+      type:String,
+      
+    },
     email: String,
     password: String
+
   }, { timestamps: true });
   
 
 
- const userModel=new mongoose.model("users1",userSchema)
+ const userModel=new mongoose.model("users",userSchema)
 
  module.exports=userModel
