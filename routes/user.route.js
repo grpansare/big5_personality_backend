@@ -1,5 +1,6 @@
 const express = require('express');  // Use require to import express
-const { signUp,signIn } = require('../controllers/userController');
+const { signUp,signIn ,updateUser, sendEmail, changepass} = require('../controllers/userController');
+const { verifyToken } = require('../utils/verifyToken');
 const router = express.Router();     // Set up the router
 
 // Define your routes here
@@ -10,5 +11,8 @@ const router = express.Router();     // Set up the router
   
 router.post('/signup',signUp)
 router.post('/signin',signIn)
+router.put('/update/:id',verifyToken,updateUser)
+router.post('/sendemail',sendEmail)
+router.post('/changepassword',changepass)
  
 module.exports=router

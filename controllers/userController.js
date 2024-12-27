@@ -2,6 +2,9 @@ const userModel=require('../models/userSchema')
 const bcrypt=require('bcryptjs')
 
 const jwt=require('jsonwebtoken')
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+
 
 
 const signUp = async (req, res) => {
@@ -43,8 +46,53 @@ const signUp = async (req, res) => {
         res.status(500).json({ message: "Error registering user", error });
     }
 };
-
-
+const generateOTP = (length = 6) => {
+    let otp = '';
+    const characters = '0123456789'; // You can include letters if needed
+    for (let i = 0; i < length; i++) {
+      otp += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return otp;
+  };
+  
+const sendEmail = async (req, res) => {
+    const { email } = req.body;
+  
+    try {
+      const user = await userModel.findOne({ email });
+      if (!user) return res.status(404).send('User not found.');
+  
+      const token = crypto.randomBytes(32).toString('hex');
+      user.resetToken = token;
+      let otp=generateOTP()
+      user.resetTokenExpiry = Date.now() + 3600000; // 1 hour expiry
+      await user.save();
+  
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+          user: 'big5personalitytest151@gmail.com',
+          pass: 'cydh wxud gsdn bgta',
+        },
+      });
+  
+      await transporter.sendMail({
+        from: 'big5personalitytest151@gmail.com',
+        to: user.email,
+        subject: 'Your OTP Code',
+        html: `
+          <p>You requested an OTP for password reset. Your OTP is <strong>${otp}</strong>.</p>
+          <p>The OTP is valid for 10 minutes.</p>
+        `,
+      });
+  
+      res.json({msg:'Otp Has been sent to your email',otp});
+    } catch (err) {
+        console.log(err);
+        
+      res.status(500).send('Server error.');
+    }
+  };
 const signIn = async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -80,5 +128,59 @@ const signIn = async (req, res) => {
         res.status(500).json({ message: "Error logging in", error, success: false });
     }
 };
-module.exports={signUp,signIn}
+
+
+const updateUser=async(req,res)=>{
+    try{
+        if(req.body.password){
+            req.body.password=bcrypt.hashSync(req.body.password,10);
+    
+        }
+        const updateUser=await userModel.findByIdAndUpdate(req.params.id,{
+            $set:{
+                username:req.body.username,
+                email:req.body.email,
+                password:req.body.password,
+                phoneno:req.body.phoneno,
+                age:req.body.age,
+                Designation:req.body.Designation,
+                fullname:req.body.fullname
+
+               
+            }
+        },{new:true})
+        const {password,...rest}=updateUser._doc;
+        return res.status(200).json(updateUser)
+       }
+       catch(err){
+        console.log(err);
+        
+          return res.status(400).json({"msg":"error updating user"})
+    }
+
+    
+}
+
+
+const changepass=async (req, res) => {
+  const { password ,userEmail} = req.body;
+
+
+  if (!password) {
+    return res.status(400).json({ msg: 'Password is required.' });
+  }
+
+  try {
+    
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await userModel.updateOne({ email: userEmail }, { password: hashedPassword });
+
+    res.status(200).json({ msg: 'Password updated successfully!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ msg: 'Failed to update password. Please try again.' });
+  }
+};
+
+module.exports={signUp,signIn,updateUser,sendEmail,changepass}
 

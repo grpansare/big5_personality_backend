@@ -7,12 +7,15 @@
  const cors = require('cors');
  const passport = require('./config/passportConfig.js');
  const authRoutes = require('./routes/google_auth.route.js');
+ const resultroutes = require('./routes/result.route.js');
+ const cookieParser = require("cookie-parser");
 
  const userRoutes=require('./routes/user.route.js')
  require('./db/conn.js');
  
  const app = express();
- 
+
+
  const PORT = process.env.PORT || 6006;
  console.log(PORT);
  
@@ -26,7 +29,10 @@
      credentials: true,
  }));
  app.use(express.json());
- 
+
+
+app.use(cookieParser());
+
  app.use(session({
      secret:process.env.SESSION_SECRET,
      resave: false,
@@ -41,6 +47,7 @@
  // Routes
  app.use('/auth', authRoutes);
  app.use('/user',userRoutes)
+ app.use('/result',resultroutes)
  
  // Start server
  app.listen(PORT, () => {
