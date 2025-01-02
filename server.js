@@ -9,6 +9,9 @@
  const authRoutes = require('./routes/google_auth.route.js');
  const resultroutes = require('./routes/result.route.js');
  const cookieParser = require("cookie-parser");
+ const multer = require('multer');
+ const path = require('path');
+
 
  const userRoutes=require('./routes/user.route.js')
  require('./db/conn.js');
@@ -38,6 +41,8 @@ app.use(cookieParser());
      resave: false,
      saveUninitialized: true,
  }));
+
+
  
 //  Initialize passport and session handling
  app.use(passport.initialize());
@@ -45,6 +50,10 @@ app.use(cookieParser());
  
  
  // Routes
+
+
+  app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
  app.use('/auth', authRoutes);
  app.use('/user',userRoutes)
  app.use('/result',resultroutes)

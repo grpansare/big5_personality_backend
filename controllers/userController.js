@@ -113,7 +113,7 @@ const signIn = async (req, res) => {
         if (!isPasswordValid) {
             return res.status(401).json({ message: "Invalid username or password", success: false });
         }
-        const token=jwt.sign({id:validUser._id},process.env.JWT_SECRET)
+        const token=jwt.sign({id:validUser._id},process.env.JWT_SECRET,{ expiresIn: '1h' })
         const {password:hashedPass,...rest}=validUser._doc
         const expiryDate=new Date(Date.now()+3600000)//1hour
         console.log(token)
@@ -128,8 +128,23 @@ const signIn = async (req, res) => {
         res.status(500).json({ message: "Error logging in", error, success: false });
     }
 };
-
-
+const logout=(req, res) => {
+  res.clearCookie('accessToken'); 
+  res.json({ message: 'Logged out successfully.' });
+};
+const uploadProfile=async(req, res) => {
+  try {
+    const updateUser=await userModel.findByIdAndUpdate(req.params.id,{
+      $set:{profilePicture:`uploads/${req.file.filename}`}
+    },{new:true})
+    res.status(200).json({
+      message: 'File uploaded successfully',
+      filePath: `uploads/${req.file.filename}`,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'File upload failed' });
+  }
+};
 const updateUser=async(req,res)=>{
     try{
         if(req.body.password){
@@ -182,5 +197,5 @@ const changepass=async (req, res) => {
   }
 };
 
-module.exports={signUp,signIn,updateUser,sendEmail,changepass}
+module.exports={signUp,signIn,updateUser,sendEmail,changepass,logout,uploadProfile}
 
