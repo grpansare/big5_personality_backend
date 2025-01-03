@@ -27,7 +27,7 @@
  
  // Middleware
  app.use(cors({
-     origin: "http://localhost:5173",
+     origin: "https://big-5-personality-test.netlify.app",
      methods: "GET,POST,PUT,DELETE",
      credentials: true,
  }));
