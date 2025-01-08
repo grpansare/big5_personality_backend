@@ -116,7 +116,7 @@ const signIn = async (req, res) => {
         const token=jwt.sign({id:validUser._id},process.env.JWT_SECRET,{ expiresIn: '1h' })
         const {password:hashedPass,...rest}=validUser._doc
         const expiryDate=new Date(Date.now()+3600000)//1hour
-        console.log(token)
+        console.log("token",token)
 
         // Respond with success
     
