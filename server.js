@@ -32,7 +32,7 @@
      credentials: true,
  }));
  app.use(express.json());
-
+app.set("trust proxy", 1);
 
 app.use(cookieParser());
 
