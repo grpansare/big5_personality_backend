@@ -39,18 +39,19 @@ app.use(cookieParser());
 
 
 app.use(
-  session({
-    name: "customSessionKey", // Your custom key name
-    secret: "yourSecretKey", // Secret used for signing the session ID cookie
-    resave: false, // Don't save the session if it wasn't modified
-    saveUninitialized: false, // Don't create a session until something is stored
-    cookie: {
-      secure: true, // Use secure cookies (requires HTTPS)
-      httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-      maxAge: 1000 * 60 * 60 * 24, // Cookie expiration (1 day)
-    },
-  })
-);
+    session({
+      name: "customSessionKey", // Custom cookie name
+      secret: "yourSecretKey",  // Secret for signing the cookie
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+        httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
+        maxAge: 1000 * 60 * 60 * 24, // 1 day
+        sameSite: "strict", // Adjust SameSite policy as needed
+      },
+    })
+  );
 
 
 
