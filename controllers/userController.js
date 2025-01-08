@@ -120,7 +120,12 @@ const signIn = async (req, res) => {
 
         // Respond with success
     
-        res.cookie('accessToken',token,{httpOnly:true,expires:expiryDate,domain: 'localhost'}).status(200).json({success:true,rest});
+       res.cookie('accessToken', token, {
+          httpOnly: true,
+          secure: true, // Requires HTTPS
+          sameSite: 'none', // Necessary for cross-origin requests
+          expires: expiryDate,
+        }).status(200).json({success:true,rest});
     } catch (error) {
         console.error(error);
 
