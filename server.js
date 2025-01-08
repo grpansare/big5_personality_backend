@@ -36,11 +36,22 @@
 
 app.use(cookieParser());
 
- app.use(session({
-     secret:process.env.SESSION_SECRET,
-     resave: false,
-     saveUninitialized: true,
- }));
+const session = require("express-session");
+
+app.use(
+  session({
+    name: "customSessionKey", // Your custom key name
+    secret: "yourSecretKey", // Secret used for signing the session ID cookie
+    resave: false, // Don't save the session if it wasn't modified
+    saveUninitialized: false, // Don't create a session until something is stored
+    cookie: {
+      secure: true, // Use secure cookies (requires HTTPS)
+      httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+      maxAge: 1000 * 60 * 60 * 24, // Cookie expiration (1 day)
+    },
+  })
+);
+
 
 
  
